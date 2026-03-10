@@ -2,7 +2,7 @@ import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 import os
-from sklearn.metrics import confusion_matrix
+from sklearn.metrics import confusion_matrix, classification_report, precision_score, recall_score, f1_score
 import seaborn as sns
 
 os.makedirs("metrics", exist_ok=True)
@@ -10,7 +10,7 @@ os.makedirs("metrics", exist_ok=True)
 dataset_path = "Augmented_Dataset"
 img_size = (128, 128)
 batch_size = 32
-EPOCHS = 40
+EPOCHS = 20
 
 train_ds = tf.keras.utils.image_dataset_from_directory(
     os.path.join(dataset_path, "training"),
@@ -81,8 +81,8 @@ model = tf.keras.Sequential([
 
     tf.keras.layers.GlobalAveragePooling2D(),
 
-    tf.keras.layers.Dense(256, activation='relu'),
-    tf.keras.layers.Dropout(0.3),
+    tf.keras.layers.Dense(256, activation='relu', kernel_regularizer=tf.keras.regularizers.l2(1e-4)),
+    tf.keras.layers.Dropout(0.3), 
 
     tf.keras.layers.Dense(num_classes, activation='softmax')
 ])
@@ -98,14 +98,16 @@ model.summary()
 callbacks = [
     tf.keras.callbacks.EarlyStopping(
         monitor='val_loss',
-        patience=6,
-        restore_best_weights=True
+        patience=10,
+        restore_best_weights=True,
+        min_delta = 0.001
     ),
     tf.keras.callbacks.ReduceLROnPlateau(
         monitor='val_loss',
         factor=0.5,
-        patience=3,
-        min_lr=1e-6
+        patience=5,
+        min_lr=1e-6,
+        min_delta=0.001
     )
 ]
 
@@ -130,6 +132,56 @@ for images, labels in test_ds:
     y_true.extend(labels.numpy())
     y_pred.extend(predicted_labels)
 
+precision = precision_score(y_true, y_pred, average='weighted')
+recall    = recall_score(y_true, y_pred, average='weighted')
+f1        = f1_score(y_true, y_pred, average='weighted')
+
+print(f"Precision: {precision:.4f}")
+print(f"Recall:    {recall:.4f}")
+print(f"F1 Score:  {f1:.4f}")
+
+with open("metrics/metrics.txt", "w") as f:
+
+    f.write("=" * 50 + "\n")
+    f.write("PER-EPOCH TRAINING & VALIDATION METRICS\n")
+    f.write("=" * 50 + "\n")
+    f.write(f"{'Epoch':<8}{'Train Acc':<14}{'Val Acc':<14}{'Train Loss':<14}{'Val Loss':<14}\n")
+    f.write("-" * 60 + "\n")
+    for ep in range(len(history.history['accuracy'])):
+        f.write(
+            f"{ep+1:<8}"
+            f"{history.history['accuracy'][ep]:<14.4f}"
+            f"{history.history['val_accuracy'][ep]:<14.4f}"
+            f"{history.history['loss'][ep]:<14.4f}"
+            f"{history.history['val_loss'][ep]:<14.4f}\n"
+        )
+
+    f.write("\n" + "=" * 50 + "\n")
+    f.write("FINAL TRAINING & VALIDATION METRICS\n")
+    f.write("=" * 50 + "\n")
+    f.write(f"Final Training Accuracy   : {history.history['accuracy'][-1]:.4f}\n")
+    f.write(f"Final Validation Accuracy : {history.history['val_accuracy'][-1]:.4f}\n")
+    f.write(f"Final Training Loss       : {history.history['loss'][-1]:.4f}\n")
+    f.write(f"Final Validation Loss     : {history.history['val_loss'][-1]:.4f}\n")
+
+    f.write("\n" + "=" * 50 + "\n")
+    f.write("TESTING METRICS\n")
+    f.write("=" * 50 + "\n")
+    f.write(f"Test Accuracy : {test_acc:.4f}\n")
+    f.write(f"Test Loss     : {test_loss:.4f}\n")
+
+    f.write("\n" + "=" * 50 + "\n")
+    f.write("PRECISION, RECALL & F1 SCORE (weighted)\n")
+    f.write("=" * 50 + "\n")
+    f.write(f"Precision : {precision:.4f}\n")
+    f.write(f"Recall    : {recall:.4f}\n")
+    f.write(f"F1 Score  : {f1:.4f}\n")
+
+    f.write("\n" + "=" * 50 + "\n")
+    f.write("PER-CLASS CLASSIFICATION REPORT\n")
+    f.write("=" * 50 + "\n")
+    f.write(classification_report(y_true, y_pred, target_names=class_names))
+
 cm = confusion_matrix(y_true, y_pred)
 
 plt.figure(figsize=(6,5))
@@ -142,6 +194,7 @@ plt.title("Confusion Matrix")
 plt.tight_layout()
 plt.savefig("metrics/confusion_matrix.png")
 plt.close()
+
 plt.figure(figsize=(12,5))
 
 plt.subplot(1,2,1)

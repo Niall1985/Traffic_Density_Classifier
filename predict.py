@@ -6,7 +6,7 @@ model = tf.keras.models.load_model("traffic_density_model.keras")
 
 class_names = ["High", "Low", "Medium"]
 
-img_path = "sample2.jpg"
+img_path = "high.jpg"
 
 img = image.load_img(
     img_path,
