@@ -61,7 +61,7 @@ A custom CNN trained to classify traffic density into three classes:
 ### 1. Clone the repository
 ```bash
 git clone https://github.com/Niall1985/traffic-density-classifier.git
-cd traffic-density-tinyml
+cd traffic-density-classifier
 ```
 
 ### 2. Install dependencies
