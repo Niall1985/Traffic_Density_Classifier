@@ -8,6 +8,7 @@ directly from camera images at the edge, optimized for deployment via TensorFlow
 
 ## 📁 Project Structure
 
+```
 TRAFFIC_DE.../
 ├── Augmented_Dataset/
 │   ├── training/
@@ -32,7 +33,7 @@ TRAFFIC_DE.../
 ├── traffic_density_model.tflite    # Dynamic range quantized model
 ├── traffic_density_model_int8...   # Full INT8 quantized TFLite model
 └── requirements.txt
-
+```
 
 ---
 

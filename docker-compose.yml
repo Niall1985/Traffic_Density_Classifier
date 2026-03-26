@@ -1,0 +1,21 @@
+version: "3"
+
+services:
+  edge:
+    build: ./edge
+    depends_on:
+      - fog
+  
+  fog:
+    build: ./fog
+    cap_add:
+      - NET_ADMIN
+    ports:
+      - "5000:5000"
+    depends_on:
+      - cloud
+  
+  cloud:
+    build: ./cloud
+    ports:
+      - "6000:6000"
