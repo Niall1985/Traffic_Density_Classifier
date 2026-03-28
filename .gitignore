@@ -3,3 +3,4 @@ testcodes/
 Augmented_Dataset/
 *.keras
 *.mp4
+test.py
