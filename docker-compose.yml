@@ -18,4 +18,4 @@ services:
   cloud:
     build: ./cloud
     ports:
-      - "6000:6000"
+      - "6001:6001"

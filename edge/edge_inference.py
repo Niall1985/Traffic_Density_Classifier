@@ -12,7 +12,7 @@ input_details = interpreter.get_input_details()
 output_details = interpreter.get_output_details()
 
 # Correct class order (same as training)
-class_names = ["High", "Low", "Medium"]
+class_names = ["High", "Medium", "Low"]
 
 def predict(img):
    
@@ -29,13 +29,13 @@ def predict(img):
     return np.argmax(output), np.max(output) * 100
 
 
-video = cv2.VideoCapture("traffic1.mp4")
+video = cv2.VideoCapture("traffic.mp4")
 
 frame_id = 0
 
 while True:
 
-    if frame_id == 30:
+    if frame_id == 400:
         break
 
     ret, frame = video.read()
@@ -93,7 +93,7 @@ video.release()
 #     return np.argmax(output), np.max(output) * 100
 
 
-# image_path = "high.jpg"
+# image_path = "low.jpg"
 # image = cv2.imread(image_path)
 
 # if image is None:
