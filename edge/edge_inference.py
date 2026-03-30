@@ -29,7 +29,7 @@ def predict(img):
     return np.argmax(output), np.max(output) * 100
 
 
-video = cv2.VideoCapture("traffic.mp4")
+video = cv2.VideoCapture("traffic_main.mp4")
 
 frame_id = 0
 
