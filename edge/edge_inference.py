@@ -35,7 +35,7 @@ frame_id = 0
 
 while True:
 
-    if frame_id == 150:
+    if frame_id == 3500:
         break
 
     ret, frame = video.read()
